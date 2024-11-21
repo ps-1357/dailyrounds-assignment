@@ -11,3 +11,6 @@ please install docker desktop or docker daemon before running the below commands
 - Clone the repo
 - Run ```docker build -t praduyot-dailyrounds .```
 - Run ```docker run -p 8000:8000 praduyot-dailyrounds```
+
+to run the test cases 
+- Run ```PYTHONPATH=. pytest```
