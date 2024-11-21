@@ -82,3 +82,29 @@ async def add_review(product_id: str, review: ReviewModel, request: Request, use
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="Product not found")
     return {"message": "Review added successfully"}
+
+@router.get("/{product_id}/reviews")
+async def get_reviews(product_id: str, page: int = Query(1, ge=1), limit: int = Query(10, ge=1)):
+    """
+    Retrieve reviews for a specific product with pagination.
+    """
+    if not ObjectId.is_valid(product_id):
+        raise HTTPException(status_code=400, detail="Invalid product ID")
+    
+    # Find the product by ID
+    product = await product_collection.find_one({"_id": ObjectId(product_id)}, {"reviews": 1})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    # Extract and paginate reviews
+    reviews = product.get("reviews", [])
+    start = (page - 1) * limit
+    end = start + limit
+    paginated_reviews = reviews[start:end]
+    
+    return {
+        "total_reviews": len(reviews),
+        "page": page,
+        "limit": limit,
+        "reviews": paginated_reviews,
+    }
